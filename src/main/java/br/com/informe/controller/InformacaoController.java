@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/informacao", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -17,7 +19,7 @@ public class InformacaoController {
     @Autowired
     InformacaoService service;
 
-    @GetMapping("/retornar-todos")
+    @PostMapping("/retornar-todos")
     public ResponseEntity<List<InformacaoDTO>> getAll(){
       return ResponseEntity.ok().body(service.getlAll());
     }
@@ -37,8 +39,20 @@ public class InformacaoController {
         service.deletar(id);
     }
 
-    @GetMapping("/retornar-por-id/{id}")
-    public ResponseEntity<InformacaoDTO> getById(@PathVariable Long id){
+    @PostMapping("/retornar-por-id")
+    public ResponseEntity<InformacaoDTO> getById(@RequestBody Long id){
         return ResponseEntity.ok().body(service.getById(id));
     }
+
+    @PutMapping
+    protected ResponseEntity<InformacaoDTO> acaoAtualizar(@RequestBody InformacaoDTO informacaoDTO) {
+
+        return  ResponseEntity.ok().body(service.update(informacaoDTO));
+    }
+
+    @PostMapping(value = "/upload-file/{idInformacao}")
+    public void getUploadFile(@RequestParam Map<String,MultipartFile> allRequestParams , @PathVariable Long idInformacao) {
+        service.uploadFotos(allRequestParams,idInformacao);
+    }
+
 }

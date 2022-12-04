@@ -34,7 +34,7 @@ public class Arquivo extends EntityBase<Long> {
 
     @JsonBackReference
     @ManyToOne(fetch=FetchType.LAZY )
-    @JoinColumn(name="id_informacao", nullable=false)
+    @JoinColumn(name="id_informacao", nullable=true)
     private Informacao informeArquivo;
 
     @JsonIgnore

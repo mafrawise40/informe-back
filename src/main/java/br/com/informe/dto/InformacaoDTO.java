@@ -36,4 +36,8 @@ public class InformacaoDTO extends BaseDTO {
     private String veiculosMat;
     private String enderecoMat;
 
+    //mat-chip saber quais pessoas foram removidas para deletar do banco de dados
+    private List<Long> pessoasRemovidas;
+    private List<Long> veiculosRemovido;
+
 }

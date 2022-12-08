@@ -1,6 +1,7 @@
 package br.com.informe.service;
 
 
+import br.com.informe.dto.ArquivoDTO;
 import br.com.informe.dto.FiltroInformacaoDTO;
 import br.com.informe.dto.InformacaoDTO;
 import br.com.informe.entity.Arquivo;
@@ -21,9 +22,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class InformacaoService {
@@ -47,17 +50,28 @@ public class InformacaoService {
 
     @Transactional
     public List<InformacaoDTO> retornarPorParamentros( FiltroInformacaoDTO filtroInformacaoDTO){
-        return  mapper.listEntityToListDTO(infoRepImp.buscarPorParamentros(filtroInformacaoDTO), InformacaoDTO.class);
+        List<Informacao> listEnty = infoRepImp.buscarPorParamentros(filtroInformacaoDTO);
+        listEnty.forEach(informacao -> {
+            informacao.setArquivos(null);
+            informacao.setPessoas(null);
+            informacao.setVeiculos(null);
+        });
+        return  mapper.listEntityToListDTO(listEnty, InformacaoDTO.class);
     }
 
     @Transactional
     public List<InformacaoDTO> getlAll(){
-        List<InformacaoDTO> retorno =  mapper.listEntityToListDTO(informeRepository.findAllByOrderByDataAlteracaoDesc(), InformacaoDTO.class);
+
+
+        List<Informacao> listEnty = informeRepository.retornarTodos();
+        listEnty.forEach(informacao -> { informacao.setArquivos(null);});
+        List<InformacaoDTO> retorno =  mapper.listEntityToListDTO( listEnty, InformacaoDTO.class);
+
         StringBuilder veiculos = new StringBuilder();
         StringBuilder enderecos= new StringBuilder();
         StringBuilder pessoas  = new StringBuilder();
         retorno.forEach( ret -> {
-
+            ret.setArquivos(null);
             if (ret.getVeiculos()!= null ) {
                 ret.getVeiculos().forEach(veiculoDTO ->
                         veiculos.append(veiculoDTO.getDescricao() + " ; ")
@@ -69,9 +83,11 @@ public class InformacaoService {
                 );
             }
             if ( ret.getMarcadores() != null && ret.getMarcadores().get(0).getEndereco() != null) {
-                ret.getMarcadores().forEach(marcadorDTO ->
-                        enderecos.append(marcadorDTO.getEndereco().getDescricao() + " ; ")
-                );
+                ret.getMarcadores().forEach(marcadorDTO -> {
+                    if (marcadorDTO.getEndereco() != null && marcadorDTO.getEndereco().getDescricao() != null) {
+                        enderecos.append(marcadorDTO.getEndereco().getDescricao() + " ; ");
+                    }
+                });
             }
 
             ret.setPessoasMat(pessoas.toString());
@@ -89,6 +105,7 @@ public class InformacaoService {
     public InformacaoDTO inserir(InformacaoDTO informacaoDTO){
         Informacao entity = mapper.dTOToEntity(informacaoDTO,Informacao.class);
         entity.setDataAlteracao(LocalDateTime.now());
+        entity.setDataInclusao(LocalDateTime.now());
         entity.setRelevancia(1L);
         entity.setSitucao("infomacao");
 
@@ -102,6 +119,22 @@ public class InformacaoService {
         if (optional.isPresent()) {
             Informacao info = optional.get();
             informeRepository.delete(info);
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deletar(Long id, Long idImagem) {
+        Optional<Informacao> optional = informeRepository.findById(id);
+        if (optional.isPresent()) {
+            Informacao info = optional.get();
+
+            List<Arquivo> listFiltro = info.getArquivos().stream().filter( arquivo -> {
+                return arquivo.getId().equals(idImagem);
+            }).collect(Collectors.toList());
+
+            listFiltro.forEach(arquivo ->{
+                arquivo.setInformeArquivo(null);
+                arquivoRepository.deleteById(arquivo.getId()); });
         }
     }
 
@@ -121,7 +154,7 @@ public class InformacaoService {
         informacao.setDataAlteracao(LocalDateTime.now());
 
         //recupera a lista de veiculos e pessoas removidas
-        if ( !dto.getVeiculosRemovido().isEmpty()){
+        if ( dto.getVeiculosRemovido() != null && !dto.getVeiculosRemovido().isEmpty()){
             dto.getVeiculosRemovido().forEach( id -> {
                 if ( id != 0) {
                     Veiculo veiculo = veiculoRepository.findById(id).get();
@@ -131,7 +164,7 @@ public class InformacaoService {
             });
         }
 
-        if ( !dto.getPessoasRemovidas().isEmpty()){
+        if ( dto.getPessoasRemovidas() != null && !dto.getPessoasRemovidas().isEmpty()){
             dto.getPessoasRemovidas().forEach( id -> {
                 Pessoa pessoa = pessoaRepository.findById(id).get();
                 pessoa.setInforme(null);
@@ -143,22 +176,24 @@ public class InformacaoService {
     }
 
     @Transactional
-    public void uploadFotos(Map<String, MultipartFile> allRequestParams , Long idInformacao) {
+    public List<ArquivoDTO> uploadFotos(Map<String, MultipartFile> allRequestParams , Long idInformacao) {
 
         Informacao informe = Informacao.builder().id(idInformacao).build();
-
+        List<ArquivoDTO> retorno = new ArrayList<>();
         allRequestParams.forEach((key, multipartFile) ->{
-           try {
-               Arquivo arquivo = Arquivo.builder().arquivo(multipartFile.getBytes())
-                                                  .descricao(multipartFile.getOriginalFilename())
-                                                  .informeArquivo(informe).build();
-               arquivoRepository.save(arquivo);
+            try {
+                Arquivo arquivo = Arquivo.builder().arquivo(multipartFile.getBytes())
+                        .descricao(multipartFile.getOriginalFilename())
+                        .informeArquivo(informe).build();
+                retorno.add(mapper.entityToDTO( arquivoRepository.save(arquivo) , ArquivoDTO.class ));
 
-           } catch (IOException e) {
-               throw new RuntimeException(e);
-           }
 
-       });
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        });
+        return retorno;
     }
 
 

@@ -51,12 +51,12 @@ public class Informacao extends EntityBase<Long>{
     @OneToMany(mappedBy="informeMarcador", cascade = CascadeType.ALL , fetch=FetchType.LAZY )
     private List<Marcador> marcadores;
 
-    @JsonManagedReference
+
+    @Column(name = "situacao")    @JsonManagedReference
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     @OneToMany(mappedBy="informeArquivo", cascade = CascadeType.ALL , fetch=FetchType.LAZY )
     private List<Arquivo> arquivos;
 
-    @Column(name = "situacao")
     private String situcao;
 
     @Column(name = "relevancia")
@@ -64,6 +64,9 @@ public class Informacao extends EntityBase<Long>{
 
     @Column(name = "dt_ultima_alteracao")
     private LocalDateTime dataAlteracao;
+
+    @Column(name = "dt_inclusao")
+    private LocalDateTime dataInclusao;
 
     @Override
     public Long getId() {

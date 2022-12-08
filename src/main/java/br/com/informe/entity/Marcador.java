@@ -48,7 +48,7 @@ public class Marcador extends EntityBase<Long>{
     @JsonBackReference
     private Informacao informeMarcador;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL , fetch=FetchType.LAZY)
     @JoinColumn(name = "id_endereco", referencedColumnName = "id_endereco")
     Endereco endereco;
 

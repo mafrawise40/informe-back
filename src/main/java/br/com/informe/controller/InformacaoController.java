@@ -39,6 +39,11 @@ public class InformacaoController {
         service.deletar(id);
     }
 
+    @DeleteMapping("/{id}/{idImagem}")
+    protected void deletarImagem(@PathVariable Long id , @PathVariable Long idImagem) {
+        service.deletar(id , idImagem);
+    }
+
     @PostMapping("/retornar-por-id")
     public ResponseEntity<InformacaoDTO> getById(@RequestBody Long id){
         return ResponseEntity.ok().body(service.getById(id));

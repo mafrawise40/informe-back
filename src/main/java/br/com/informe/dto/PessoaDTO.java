@@ -18,8 +18,13 @@ public class PessoaDTO  extends BaseDTO  {
     private String nome;
     private String rg;
     private String situacao;
-    private String  observacao;
+    private String observacao;
     private String cpf;
+    private String pai;
+    private String mae;
+    private String apelido;
+    private String linkGenesis;
+    private String detalhe;
 
     @JsonBackReference(value = "pessoaMang")
     private InformacaoDTO informeArquivo;

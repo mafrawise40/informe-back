@@ -9,6 +9,8 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static javax.persistence.CascadeType.*;
+
 
 @Builder
 @NoArgsConstructor
@@ -37,12 +39,12 @@ public class Informacao extends EntityBase<Long>{
 
     @JsonManagedReference
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    @OneToMany(mappedBy="informe", cascade = CascadeType.ALL , fetch=FetchType.LAZY )
+    @OneToMany(mappedBy="informe", cascade = {PERSIST, MERGE, REFRESH, DETACH} , fetch=FetchType.LAZY )
     private List<Pessoa> pessoas;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     @JsonManagedReference
-    @OneToMany(mappedBy="informeVeiculo",  cascade = CascadeType.ALL , fetch=FetchType.LAZY )
+    @OneToMany(mappedBy="informeVeiculo",  cascade = {PERSIST, MERGE, REFRESH, DETACH} , fetch=FetchType.LAZY )
     private List<Veiculo> veiculos;
 
 
@@ -54,7 +56,7 @@ public class Informacao extends EntityBase<Long>{
 
     @Column(name = "situacao")    @JsonManagedReference
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    @OneToMany(mappedBy="informeArquivo", cascade = CascadeType.ALL , fetch=FetchType.LAZY )
+    @OneToMany(mappedBy="informeArquivo", cascade = {PERSIST, MERGE, REFRESH, DETACH} , fetch=FetchType.LAZY )
     private List<Arquivo> arquivos;
 
     private String situcao;

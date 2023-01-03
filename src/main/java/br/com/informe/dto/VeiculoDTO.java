@@ -15,6 +15,7 @@ public class VeiculoDTO extends BaseDTO  {
 
     private Long id;
     private String descricao;
+    private String placa;
 
     @JsonBackReference(value = "veiculoMang")
     private InformacaoDTO informeArquivo;

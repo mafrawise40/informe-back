@@ -28,6 +28,9 @@ public class Arquivo extends EntityBase<Long> {
     @Column(name="descricao")
     private String descricao;
 
+    @Column(name="titulo")
+    private String titulo;
+
     @Lob
     private byte[] arquivo;
 

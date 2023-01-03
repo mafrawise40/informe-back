@@ -14,6 +14,7 @@ public class EnderecoDTO extends BaseDTO {
 
     private Long id;
     private String descricao;
+    private String observacao;
     private String regiao;
     private String uf;
 }

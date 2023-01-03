@@ -40,10 +40,24 @@ public class Pessoa extends EntityBase<Long>{
     @Column(name = "cpf")
     private String cpf;
 
+    @Column(name = "pai")
+    private String pai;
+
+    @Column(name = "mae")
+    private String mae;
+
+    @Column(name = "apelido")
+    private String apelido;
+    @Column(name = "linkGenesis")
+    private String linkGenesis;
+
+    @Column(name = "detalhe", columnDefinition = "TEXT")
+    private String detalhe;
+
 
     @JsonBackReference
     @ManyToOne(fetch=FetchType.LAZY )
-    @JoinColumn(name="id_informacao", nullable=false)
+    @JoinColumn(name="id_informacao", nullable=true)
     private Informacao informe;
 
     @JsonIgnore

@@ -17,6 +17,7 @@ public class ArquivoDTO extends BaseDTO {
     private Long id;
     private String descricao;
     private byte[] arquivo;
+    private String titulo;
 
     @JsonBackReference(value = "arquivoMang")
     private InformacaoDTO informeArquivo;

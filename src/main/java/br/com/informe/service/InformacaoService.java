@@ -64,7 +64,7 @@ public class InformacaoService {
 
 
         List<Informacao> listEnty = informeRepository.retornarTodos();
-        listEnty.forEach(informacao -> { informacao.setArquivos(null);});
+        listEnty.forEach(informacao ->  informacao.setArquivos(null));
         List<InformacaoDTO> retorno =  mapper.listEntityToListDTO( listEnty, InformacaoDTO.class);
 
         StringBuilder veiculos = new StringBuilder();
@@ -118,6 +118,19 @@ public class InformacaoService {
         Optional<Informacao> optional = informeRepository.findById(id);
         if (optional.isPresent()) {
             Informacao info = optional.get();
+            info.getVeiculos().stream().forEach(veiculo -> {
+                veiculo.setInformeVeiculo(null);
+                veiculoRepository.save(veiculo);
+            });
+            info.getPessoas().forEach(pessoa -> {
+                pessoa.setInforme(null);
+                pessoaRepository.save(pessoa);
+            });
+            info.getArquivos().forEach(arquivo -> {
+                arquivo.setInformeArquivo(null);
+                arquivoRepository.save(arquivo);
+            });
+            info = informeRepository.save(info);
             informeRepository.delete(info);
         }
     }
@@ -176,15 +189,29 @@ public class InformacaoService {
     }
 
     @Transactional
-    public List<ArquivoDTO> uploadFotos(Map<String, MultipartFile> allRequestParams , Long idInformacao) {
+    public List<ArquivoDTO> uploadFotos(Map<String, MultipartFile> allRequestParams ,
+                                        Map<String, String> allComprimidos,
+                                        Map<String,String> tituloImagem,
+                                        Long idInformacao) {
 
         Informacao informe = Informacao.builder().id(idInformacao).build();
         List<ArquivoDTO> retorno = new ArrayList<>();
         allRequestParams.forEach((key, multipartFile) ->{
             try {
+
+
+
                 Arquivo arquivo = Arquivo.builder().arquivo(multipartFile.getBytes())
                         .descricao(multipartFile.getOriginalFilename())
                         .informeArquivo(informe).build();
+
+                if( allComprimidos.containsKey(key) ) {
+                    //arquivo.setArquivoComprimido(allComprimidos.get(key));
+                }
+                if( tituloImagem.containsKey(key) ) {
+                    arquivo.setTitulo(tituloImagem.get(key));
+                }
+
                 retorno.add(mapper.entityToDTO( arquivoRepository.save(arquivo) , ArquivoDTO.class ));
 
 

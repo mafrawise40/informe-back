@@ -32,6 +32,9 @@ public class Endereco   extends EntityBase<Long>{
     @Column(name = "uf")
     private String uf;
 
+    @Column(name = "observacao")
+    private String observacao;
+
 
     @Override
     public Long getId() {

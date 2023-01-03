@@ -56,8 +56,11 @@ public class InformacaoController {
     }
 
     @PostMapping(value = "/upload-file/{idInformacao}")
-    public void getUploadFile(@RequestParam Map<String,MultipartFile> allRequestParams , @PathVariable Long idInformacao) {
-        service.uploadFotos(allRequestParams,idInformacao);
+    public void getUploadFile(@RequestParam Map<String,MultipartFile> allRequestParams,
+                              @RequestParam Map<String,String> comprimido ,
+                              @RequestParam Map<String,String> tituloImagem
+            , @PathVariable Long idInformacao) {
+        service.uploadFotos(allRequestParams, comprimido,tituloImagem ,idInformacao );
     }
 
 }

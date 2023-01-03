@@ -30,6 +30,9 @@ public class Veiculo extends EntityBase<Long>{
     @Column(name = "descricao")
     private String descricao;
 
+    @Column(name = "placa")
+    private String placa;
+
 
     @ManyToOne(fetch=FetchType.LAZY )
     @JoinColumn(name="id_informacao")

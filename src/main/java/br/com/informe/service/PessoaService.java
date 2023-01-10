@@ -31,7 +31,7 @@ public class PessoaService {
         Optional<Pessoa> optional = repository.findById(id);
         if (optional.isPresent()) {
             Pessoa pessoaDeletada = optional.get();
-            pessoaDeletada.setInforme(null);
+          //  pessoaDeletada.setInforme(null);
 
             repository.deleteById(pessoaDeletada.getId());
         }
@@ -44,6 +44,12 @@ public class PessoaService {
     }
 
     @Transactional
+    public PessoaDTO atualizar(PessoaDTO pessoaDTO){
+        Pessoa entity = mapper.dTOToEntity(pessoaDTO,Pessoa.class);
+        return  mapper.entityToDTO(repository.save(entity),PessoaDTO.class);
+    }
+
+    @Transactional
     public PessoaDTO getById(Long id) {
         Optional<Pessoa> optional = repository.findById(id);
         if (optional.isPresent()) {
@@ -51,6 +57,14 @@ public class PessoaService {
         }else{
             return null;
         }
+    }
+
+    @Transactional
+    public List<PessoaDTO> getByParametros(PessoaDTO dto) {
+        List<Pessoa> retorno = repository.getByParametros(dto.getNome());
+
+        return mapper.listEntityToListDTO(retorno,PessoaDTO.class);
+
     }
 
 }

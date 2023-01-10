@@ -1,6 +1,9 @@
 package br.com.informe.dto;
 
 
+import br.com.informe.entity.InformacaoPessoa;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
@@ -30,6 +33,9 @@ public class InformacaoDTO extends BaseDTO {
     private String situcao;
     private Long relevancia;
     private LocalDateTime dataAlteracao;
+
+   /* @JsonManagedReference("informePessoaMan01")
+    private List<InformacaoPessoaDTO> informePessoas;*/
 
     //exibição mat-table para ser melhor filtrado
     private String pessoasMat;

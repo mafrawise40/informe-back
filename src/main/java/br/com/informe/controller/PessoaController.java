@@ -31,16 +31,22 @@ public class PessoaController {
         return ResponseEntity.ok().body(service.inserir(pessoaDTO));
     }
 
+    @PutMapping
+    public ResponseEntity<PessoaDTO> atualizar(@RequestBody PessoaDTO pessoadto){
+        return ResponseEntity.ok().body(service.atualizar(pessoadto));
+    }
+
+
     @PostMapping("/retornar-por-id")
     public ResponseEntity<PessoaDTO> getById(@RequestBody Long id){
         return ResponseEntity.ok().body(service.getById(id));
     }
 
-   /* @PostMapping("/retornar-por-parametros")
-    public ResponseEntity<List<PessoaDTO>> retornarPorParametros(@RequestBody FiltroPessoaDTO filtroPessoaDTO){
-        return ResponseEntity.ok().body(service.retornarPorParamentros(filtroPessoaDTO));
+    @PostMapping("/get-by-paramentros")
+    public ResponseEntity<List<PessoaDTO>> retornarPorParametros(@RequestBody PessoaDTO filtroPessoaDTO){
+        return ResponseEntity.ok().body(service.getByParametros(filtroPessoaDTO));
     }
-
+ /*
     @DeleteMapping("/{id}/{idImagem}")
     protected void deletarImagem(@PathVariable Long id , @PathVariable Long idImagem) {
         service.deletar(id , idImagem);

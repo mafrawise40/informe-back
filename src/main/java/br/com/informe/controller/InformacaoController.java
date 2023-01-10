@@ -49,6 +49,11 @@ public class InformacaoController {
         return ResponseEntity.ok().body(service.getById(id));
     }
 
+    @PostMapping("/retornar-por-idd/{id}")
+    public ResponseEntity<InformacaoDTO> getByIdd(@PathVariable Long id){
+        return ResponseEntity.ok().body(service.getById(id));
+    }
+
     @PutMapping
     protected ResponseEntity<InformacaoDTO> acaoAtualizar(@RequestBody InformacaoDTO informacaoDTO) {
 

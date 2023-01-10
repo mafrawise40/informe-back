@@ -4,10 +4,7 @@ package br.com.informe.service;
 import br.com.informe.dto.ArquivoDTO;
 import br.com.informe.dto.FiltroInformacaoDTO;
 import br.com.informe.dto.InformacaoDTO;
-import br.com.informe.entity.Arquivo;
-import br.com.informe.entity.Informacao;
-import br.com.informe.entity.Pessoa;
-import br.com.informe.entity.Veiculo;
+import br.com.informe.entity.*;
 import br.com.informe.mapper.Mapper;
 import br.com.informe.repository.ArquivoRepository;
 import br.com.informe.repository.InformacaoRepository;
@@ -53,7 +50,7 @@ public class InformacaoService {
         List<Informacao> listEnty = infoRepImp.buscarPorParamentros(filtroInformacaoDTO);
         listEnty.forEach(informacao -> {
             informacao.setArquivos(null);
-            informacao.setPessoas(null);
+           // informacao.setPessoas(null);
             informacao.setVeiculos(null);
         });
         return  mapper.listEntityToListDTO(listEnty, InformacaoDTO.class);
@@ -77,11 +74,17 @@ public class InformacaoService {
                         veiculos.append(veiculoDTO.getDescricao() + " ; ")
                 );
             }
+
             if ( ret.getPessoas() != null) {
                 ret.getPessoas().forEach(pessoaDTO ->
-                        pessoas.append(pessoaDTO.getNome() + " ; ")
+                                pessoas.append(pessoaDTO.getNome() + " ; ")
                 );
             }
+            /*if ( ret.getInformePessoas() != null) {
+                ret.getInformePessoas().forEach(pessoaDTO ->
+                        pessoas.append(pessoaDTO.getPessoa().getNome() + " ; ")
+                );
+            }*/
             if ( ret.getMarcadores() != null && ret.getMarcadores().get(0).getEndereco() != null) {
                 ret.getMarcadores().forEach(marcadorDTO -> {
                     if (marcadorDTO.getEndereco() != null && marcadorDTO.getEndereco().getDescricao() != null) {
@@ -109,6 +112,17 @@ public class InformacaoService {
         entity.setRelevancia(1L);
         entity.setSitucao("infomacao");
 
+        //por enquanto
+      /* List<InformacaoPessoa> newInformePessoaList = new ArrayList<>();
+        informacaoDTO.getPessoas().forEach(pessoa -> {
+            InformacaoPessoa newInformePessoa = InformacaoPessoa.builder()
+                    .informacao(entity)
+                    .pessoa(mapper.dTOToEntity(pessoa , Pessoa.class))
+                    .build();
+            newInformePessoaList.add(newInformePessoa);
+        });
+
+        entity.setInformePessoas(newInformePessoaList);*/
 
         return  mapper.entityToDTO(informeRepository.save(entity),InformacaoDTO.class);
     }
@@ -122,10 +136,10 @@ public class InformacaoService {
                 veiculo.setInformeVeiculo(null);
                 veiculoRepository.save(veiculo);
             });
-            info.getPessoas().forEach(pessoa -> {
+          /*  info.getPessoas().forEach(pessoa -> {
                 pessoa.setInforme(null);
                 pessoaRepository.save(pessoa);
-            });
+            });*/
             info.getArquivos().forEach(arquivo -> {
                 arquivo.setInformeArquivo(null);
                 arquivoRepository.save(arquivo);
@@ -180,7 +194,7 @@ public class InformacaoService {
         if ( dto.getPessoasRemovidas() != null && !dto.getPessoasRemovidas().isEmpty()){
             dto.getPessoasRemovidas().forEach( id -> {
                 Pessoa pessoa = pessoaRepository.findById(id).get();
-                pessoa.setInforme(null);
+                //pessoa.setInforme(null);
                 pessoaRepository.save(pessoa);
             });
         }

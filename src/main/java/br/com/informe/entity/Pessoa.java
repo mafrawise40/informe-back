@@ -2,9 +2,14 @@ package br.com.informe.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
+
+import static javax.persistence.CascadeType.*;
+import static javax.persistence.CascadeType.DETACH;
 
 
 @Builder
@@ -59,6 +64,12 @@ public class Pessoa extends EntityBase<Long>{
     @ManyToOne(fetch=FetchType.LAZY )
     @JoinColumn(name="id_informacao", nullable=true)
     private Informacao informe;
+
+
+   // @JsonManagedReference("informePessoaEntity2")
+   /* @JsonBackReference("informePessoaEntity2")
+    @OneToMany(mappedBy = "pessoa", fetch = FetchType.LAZY, cascade = {PERSIST, MERGE, REFRESH, DETACH}, orphanRemoval = true)
+    private List<InformacaoPessoa> informePessoa;*/
 
     @JsonIgnore
     public Informacao getInforme() {

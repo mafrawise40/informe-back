@@ -1,7 +1,9 @@
 package br.com.informe.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
@@ -54,7 +56,8 @@ public class Informacao extends EntityBase<Long>{
     private List<Marcador> marcadores;
 
 
-    @Column(name = "situacao")    @JsonManagedReference
+    @Column(name = "situacao")
+    @JsonManagedReference
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     @OneToMany(mappedBy="informeArquivo", cascade = {PERSIST, MERGE, REFRESH, DETACH} , fetch=FetchType.LAZY )
     private List<Arquivo> arquivos;
@@ -69,6 +72,11 @@ public class Informacao extends EntityBase<Long>{
 
     @Column(name = "dt_inclusao")
     private LocalDateTime dataInclusao;
+
+
+    /*@JsonManagedReference("informePessoaEntity")
+    @OneToMany(mappedBy = "informacao", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<InformacaoPessoa> informePessoas;*/
 
     @Override
     public Long getId() {

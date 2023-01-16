@@ -1,11 +1,11 @@
 package br.com.informe.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 
 import javax.persistence.*;
+
 
 @Builder
 @NoArgsConstructor
@@ -25,15 +25,18 @@ public class InformacaoPessoa  extends EntityBase<Long>{
     @Column(name = "id_informacao_pessoa")
     private Long id;
 
-    //@JsonBackReference("informePessoaEntity")
-    @JsonBackReference("informePessoaEntity")
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_informacao")
+    @JsonIgnore
     private Informacao informacao;
 
-    //@JsonBackReference("informePessoaEntity2")
-    @JsonManagedReference("informePessoaEntity2")
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_pessoa")
     private Pessoa pessoa;
+
+    @Column(name = "envolvimento")
+    private String envolvimento;
 }

@@ -39,9 +39,10 @@ public class Informacao extends EntityBase<Long>{
     @Column(name = "detalhe" , columnDefinition = "text")
     private String detalhe;
 
-    @JsonManagedReference
+    /*@JsonManagedReference
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    @OneToMany(mappedBy="informe", cascade = {PERSIST, MERGE, REFRESH, DETACH} , fetch=FetchType.LAZY )
+    @OneToMany(mappedBy="informe", cascade = {PERSIST, MERGE, REFRESH, DETACH} , fetch=FetchType.LAZY )*/
+    @Transient
     private List<Pessoa> pessoas;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
@@ -56,12 +57,13 @@ public class Informacao extends EntityBase<Long>{
     private List<Marcador> marcadores;
 
 
-    @Column(name = "situacao")
+
     @JsonManagedReference
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     @OneToMany(mappedBy="informeArquivo", cascade = {PERSIST, MERGE, REFRESH, DETACH} , fetch=FetchType.LAZY )
     private List<Arquivo> arquivos;
 
+    @Column(name = "situacao")
     private String situcao;
 
     @Column(name = "relevancia")
@@ -74,9 +76,9 @@ public class Informacao extends EntityBase<Long>{
     private LocalDateTime dataInclusao;
 
 
-    /*@JsonManagedReference("informePessoaEntity")
-    @OneToMany(mappedBy = "informacao", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<InformacaoPessoa> informePessoas;*/
+    //@JsonManagedReference("informePessoaEntity")
+    @OneToMany(mappedBy = "informacao", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<InformacaoPessoa> informePessoas;
 
     @Override
     public Long getId() {

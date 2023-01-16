@@ -4,12 +4,10 @@ package br.com.informe.service;
 import br.com.informe.dto.ArquivoDTO;
 import br.com.informe.dto.FiltroInformacaoDTO;
 import br.com.informe.dto.InformacaoDTO;
+import br.com.informe.dto.PessoaDTO;
 import br.com.informe.entity.*;
 import br.com.informe.mapper.Mapper;
-import br.com.informe.repository.ArquivoRepository;
-import br.com.informe.repository.InformacaoRepository;
-import br.com.informe.repository.PessoaRepository;
-import br.com.informe.repository.VeiculoRepository;
+import br.com.informe.repository.*;
 import br.com.informe.repository.implementation.InformacaoRepositoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,6 +38,9 @@ public class InformacaoService {
     PessoaRepository pessoaRepository;
 
     @Autowired
+    InformacaoPessoaRepository informacaoPessoaRepository;
+
+    @Autowired
     ArquivoRepository arquivoRepository;
 
     @Autowired
@@ -61,7 +62,17 @@ public class InformacaoService {
 
 
         List<Informacao> listEnty = informeRepository.retornarTodos();
-        listEnty.forEach(informacao ->  informacao.setArquivos(null));
+        List<Pessoa> pessoaList = new ArrayList<>();
+        listEnty.forEach(informacao ->  {
+            informacao.setArquivos(null);
+            informacao.getInformePessoas().forEach(pessoaInforme-> {
+                if ( informacao.getPessoas() == null ) {
+                     informacao.setPessoas(new ArrayList<>());
+                }else {
+                     informacao.getPessoas().add(pessoaInforme.getPessoa());
+                }
+            });
+        });
         List<InformacaoDTO> retorno =  mapper.listEntityToListDTO( listEnty, InformacaoDTO.class);
 
         StringBuilder veiculos = new StringBuilder();
@@ -75,16 +86,16 @@ public class InformacaoService {
                 );
             }
 
-            if ( ret.getPessoas() != null) {
+            /*if ( ret.getPessoas() != null) {
                 ret.getPessoas().forEach(pessoaDTO ->
                                 pessoas.append(pessoaDTO.getNome() + " ; ")
                 );
-            }
-            /*if ( ret.getInformePessoas() != null) {
+            }*/
+            if ( ret.getInformePessoas() != null) {
                 ret.getInformePessoas().forEach(pessoaDTO ->
                         pessoas.append(pessoaDTO.getPessoa().getNome() + " ; ")
                 );
-            }*/
+            }
             if ( ret.getMarcadores() != null && ret.getMarcadores().get(0).getEndereco() != null) {
                 ret.getMarcadores().forEach(marcadorDTO -> {
                     if (marcadorDTO.getEndereco() != null && marcadorDTO.getEndereco().getDescricao() != null) {
@@ -113,16 +124,17 @@ public class InformacaoService {
         entity.setSitucao("infomacao");
 
         //por enquanto
-      /* List<InformacaoPessoa> newInformePessoaList = new ArrayList<>();
-        informacaoDTO.getPessoas().forEach(pessoa -> {
-            InformacaoPessoa newInformePessoa = InformacaoPessoa.builder()
-                    .informacao(entity)
-                    .pessoa(mapper.dTOToEntity(pessoa , Pessoa.class))
-                    .build();
-            newInformePessoaList.add(newInformePessoa);
-        });
+       List<InformacaoPessoa> newInformePessoaList = new ArrayList<>();
+       if ( entity.getInformePessoas() != null ) {
+           entity.getInformePessoas().forEach(informacaoPessoa -> {
+               if (informacaoPessoa.getPessoa().getId() == null || informacaoPessoa.getPessoa().getId() == 0) {
+                   Pessoa pessoa = pessoaRepository.save(informacaoPessoa.getPessoa());
+                   informacaoPessoa.setPessoa(pessoa);
+               }
+               informacaoPessoa.setInformacao(entity);
 
-        entity.setInformePessoas(newInformePessoaList);*/
+           });
+       }
 
         return  mapper.entityToDTO(informeRepository.save(entity),InformacaoDTO.class);
     }
@@ -180,6 +192,20 @@ public class InformacaoService {
         Informacao informacao = mapper.dTOToEntity(dto, Informacao.class);
         informacao.setDataAlteracao(LocalDateTime.now());
 
+        //por enquanto
+
+        if ( informacao.getInformePessoas() != null ) {
+            informacao.getInformePessoas().forEach(
+                    informacaoPessoa -> {
+                        if (informacaoPessoa.getPessoa().getId() == null || informacaoPessoa.getPessoa().getId() == 0) {
+                            Pessoa pessoa = pessoaRepository.save(informacaoPessoa.getPessoa());
+                            informacaoPessoa.setPessoa(pessoa);
+                        }
+                        informacaoPessoa.setInformacao(informacao);
+                    }
+            );
+        }
+
         //recupera a lista de veiculos e pessoas removidas
         if ( dto.getVeiculosRemovido() != null && !dto.getVeiculosRemovido().isEmpty()){
             dto.getVeiculosRemovido().forEach( id -> {
@@ -193,9 +219,10 @@ public class InformacaoService {
 
         if ( dto.getPessoasRemovidas() != null && !dto.getPessoasRemovidas().isEmpty()){
             dto.getPessoasRemovidas().forEach( id -> {
-                Pessoa pessoa = pessoaRepository.findById(id).get();
-                //pessoa.setInforme(null);
-                pessoaRepository.save(pessoa);
+                Optional<InformacaoPessoa> informacaoPessoa = informacaoPessoaRepository.findByInformacaoAndPessoa(dto.getId() , id);
+                if ( informacaoPessoa.isPresent()){
+                    informacaoPessoaRepository.deleteById(informacaoPessoa.get().getId());
+                }
             });
         }
 

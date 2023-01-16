@@ -11,16 +11,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "/arquivo", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ArquivoController {
 
-    @Autowired
-    ArquivoService service;
+        @Autowired
+        ArquivoService service;
 
-    @DeleteMapping("/{id}")
-    protected void deletar(@PathVariable Long id) {
-        service.deletar(id);
-    }
+        @DeleteMapping("/{id}")
+        protected void deletar(@PathVariable Long id) {
+            service.deletar(id);
+        }
 
-    @PutMapping
-    protected ResponseEntity<ArquivoDTO> acaoAtualizar(@RequestBody ArquivoDTO arquivoDTO) {
-        return  ResponseEntity.ok().body(service.alterar(arquivoDTO));
-    }
+        @PutMapping
+        protected ResponseEntity<ArquivoDTO> acaoAtualizar(@RequestBody ArquivoDTO arquivoDTO) {
+            return  ResponseEntity.ok().body(service.alterar(arquivoDTO));
+        }
 }

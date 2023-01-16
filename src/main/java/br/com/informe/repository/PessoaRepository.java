@@ -11,7 +11,18 @@ import java.util.List;
 @Repository
 public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
     @Query("SELECT pe FROM Pessoa pe "
-            + " WHERE (:nome is null or pe.nome like %:nome%) "
+            + " WHERE (:nome is null or LOWER(pe.nome) like %:nome%) "
+            + " AND (:apelido is null or LOWER(pe.apelido) like %:apelido%) "
+            + " AND (:mae is null or LOWER(pe.mae) like %:mae%) "
+            + " AND (:pai is null or LOWER(pe.pai) like %:pai%) "
+            + " AND (:cpf is null or CAST( regexp_replace(pe.cpf, '[^0-9]', '', 'g') AS string ) like %:cpf%) "
             + " ")
-    List<Pessoa> getByParametros(@Param("nome") String nome);
+    List<Pessoa> getByParametros(@Param("nome") String nome ,
+                                 @Param("cpf") String cpf ,
+                                 @Param("apelido") String apelido ,
+                                 @Param("mae") String mae ,
+                                 @Param("pai") String pai);
+
+
+    List<Pessoa> findAllByOrderByIdDesc();
 }

@@ -1,6 +1,6 @@
 package br.com.informe.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
@@ -9,7 +9,6 @@ import javax.persistence.*;
 import java.util.List;
 
 import static javax.persistence.CascadeType.*;
-import static javax.persistence.CascadeType.DETACH;
 
 
 @Builder
@@ -23,7 +22,6 @@ import static javax.persistence.CascadeType.DETACH;
 public class Pessoa extends EntityBase<Long>{
 
     private static final long serialVersionUID = 1L;
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,27 +57,19 @@ public class Pessoa extends EntityBase<Long>{
     @Column(name = "detalhe", columnDefinition = "TEXT")
     private String detalhe;
 
+    @Column(name = "nascimento")
+    private String nascimento;
 
-    @JsonBackReference
-    @ManyToOne(fetch=FetchType.LAZY )
-    @JoinColumn(name="id_informacao", nullable=true)
-    private Informacao informe;
-
-
-   // @JsonManagedReference("informePessoaEntity2")
-   /* @JsonBackReference("informePessoaEntity2")
-    @OneToMany(mappedBy = "pessoa", fetch = FetchType.LAZY, cascade = {PERSIST, MERGE, REFRESH, DETACH}, orphanRemoval = true)
-    private List<InformacaoPessoa> informePessoa;*/
 
     @JsonIgnore
-    public Informacao getInforme() {
-        return informe;
-    }
+    @OneToMany(mappedBy = "pessoa", fetch = FetchType.LAZY, cascade = {PERSIST, MERGE, REFRESH, DETACH})
+    private List<InformacaoPessoa> informePessoa;
 
-    @JsonIgnore
-    public void setInforme(Informacao informe) {
-        this.informe = informe;
-    }
+
+    @JsonManagedReference
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+    @OneToMany(mappedBy="pessoaArquivo", cascade = {PERSIST, MERGE, REFRESH, DETACH} , fetch=FetchType.LAZY )
+    private List<ArquivoPessoa> arquivos;
 
     @Override
     public Long getId() {

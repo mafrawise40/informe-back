@@ -1,8 +1,7 @@
 package br.com.informe.dto;
 
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 @Builder
@@ -10,14 +9,16 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+
 public class InformacaoPessoaDTO extends  BaseDTO {
 
     private Long id;
 
 
-    @JsonBackReference("informePessoaMan01")
+    @JsonIgnore
     private InformacaoDTO informacao;
-    //@JsonBackReference("informePessoaMan02")
-    @JsonBackReference("informePessoaMan02")
     private PessoaDTO pessoa;
+    private String envolvimento;
+
+
 }

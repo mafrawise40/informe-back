@@ -22,8 +22,20 @@ public class InformacaoRepositoryImpl {
         Map<String, Object> parametros = new HashMap<>();
         StringBuilder queryStr = new StringBuilder();
 
-        if (filtro.getCampoPesquisa() != null){
-            this.tratarSqlCampoPesquisa(parametros , queryStr , filtro);
+        boolean somenteNumeros = false;
+
+
+        if (filtro.getCampoPesquisa() != null && !filtro.getCampoPesquisa().equals("")){
+            if ( filtro.getCampoPesquisa().matches("[0-9]+")) {
+                somenteNumeros = true;
+            }
+
+            if ( somenteNumeros) {
+                this.setPesquisaSomenteNumeros(parametros , queryStr , filtro);
+            }else {
+                this.tratarSqlCampoPesquisa(parametros , queryStr , filtro);
+            }
+
         } else {
            this.tratarSqlSomenteDatas(parametros , queryStr , filtro);
         }
@@ -31,51 +43,13 @@ public class InformacaoRepositoryImpl {
         Query query = em.createNativeQuery(queryStr.toString(), Informacao.class);
         parametros.forEach(query::setParameter);
 
+
         return query.getResultList();
     }
 
     public void tratarSqlCampoPesquisa( Map<String, Object> parametros ,  StringBuilder queryStr, FiltroInformacaoDTO filtro ){
 
-        this.setSelect(queryStr);
-        this.setJoins(queryStr);
-        queryStr.append(" where info.id_informacao is not null and lower(info.detalhe) like lower(:campoPesquisa) ");
-        parametros.put(CAMPO_PESQUISA , "%"+filtro.getCampoPesquisa()+"%");
-        this.tratarDataInicioComFinalNull(parametros,queryStr,filtro);
-        this.tratarDataInicioComFinal(parametros,queryStr,filtro);
-
-        queryStr.append(SQL_UNION);
-        this.setSelect(queryStr);
-        this.setJoins(queryStr);
-        queryStr.append(" WHERE info.id_informacao is not null and lower(info.titulo) like lower(:campoPesquisa) ");
-        parametros.put(CAMPO_PESQUISA , "%"+filtro.getCampoPesquisa()+"%");
-        this.tratarDataInicioComFinalNull(parametros,queryStr,filtro);
-        this.tratarDataInicioComFinal(parametros,queryStr,filtro);
-
-        queryStr.append(SQL_UNION);
-        this.setSelect(queryStr);
-        this.setJoins(queryStr);
-        queryStr.append(" WHERE info.id_informacao is not null and lower(te.descricao) like lower(:campoPesquisa) ");
-        parametros.put(CAMPO_PESQUISA , "%"+filtro.getCampoPesquisa()+"%");
-        this.tratarDataInicioComFinalNull(parametros,queryStr,filtro);
-        this.tratarDataInicioComFinal(parametros,queryStr,filtro);
-
-        queryStr.append(SQL_UNION);
-        this.setSelect(queryStr);
-        this.setJoins(queryStr);
-        queryStr.append("  WHERE info.id_informacao is not null and lower(tp.nome) like lower(:campoPesquisa) ");
-        parametros.put(CAMPO_PESQUISA , "%"+filtro.getCampoPesquisa()+"%");
-        this.tratarDataInicioComFinalNull(parametros,queryStr,filtro);
-        this.tratarDataInicioComFinal(parametros,queryStr,filtro);
-
-        queryStr.append(SQL_UNION);
-        this.setSelect(queryStr);
-        this.setJoins(queryStr);
-        queryStr.append("  WHERE info.id_informacao is not null and lower(tv.descricao) like lower(:campoPesquisa) ");
-        parametros.put(CAMPO_PESQUISA , "%"+filtro.getCampoPesquisa()+"%");
-        this.tratarDataInicioComFinalNull(parametros,queryStr,filtro);
-        this.tratarDataInicioComFinal(parametros,queryStr,filtro);
-
-
+           this.setPesquisarNormal(parametros, queryStr , filtro);
 
     }
 
@@ -88,7 +62,12 @@ public class InformacaoRepositoryImpl {
             this.tratarDataInicioComFinalNull(parametros,queryStr,filtro);
             this.tratarDataInicioComFinal(parametros,queryStr,filtro);
 
-        queryStr.append(" ORDER BY info.dt_ultima_alteracao DESC ");
+        queryStr.append(" ORDER BY info.id_informacao DESC ");
+
+
+        if ( filtro.getLimit() != null) {
+            queryStr.append(" LIMIT  " + filtro.getLimit());
+        }
 
     }
 
@@ -117,6 +96,91 @@ public class InformacaoRepositoryImpl {
                 " left join informe.tb_endereco te on tm.id_endereco  = te.id_endereco " +
                 " left join informe.tb_pessoa tp   on tp.id_informacao = info.id_informacao " +
                 " left join informe.tb_veiculo tv  on tv.id_informacao = info.id_informacao" );
+    }
+
+    public void setOrderByUltimaALteracaoDESC(StringBuilder queryStr){
+        queryStr.append(" ORDER BY info.dt_ultima_alteracao DESC ");
+    }
+
+    public void setLimit(StringBuilder queryStr, FiltroInformacaoDTO filtro){
+        if ( filtro.getLimit() != null) {
+            queryStr.append(" LIMIT  " + filtro.getLimit());
+        }
+    }
+
+
+    public void setPesquisaSomenteNumeros(Map<String, Object> parametros ,  StringBuilder queryStr, FiltroInformacaoDTO filtro  ){
+
+        this.setSelect(queryStr);
+        this.setJoins(queryStr);
+        queryStr.append(" where cast(info.id_informacao as text) is not null and cast(info.id_informacao as text) like :campoPesquisa ");
+        parametros.put(CAMPO_PESQUISA , "%"+filtro.getCampoPesquisa()+"%");
+        this.tratarDataInicioComFinalNull(parametros,queryStr,filtro);
+        this.tratarDataInicioComFinal(parametros,queryStr,filtro);
+
+        queryStr.append(SQL_UNION);
+        this.setSelect(queryStr);
+        this.setJoins(queryStr);
+        queryStr.append("  WHERE info.id_informacao is not null and lower(tv.descricao) like lower(:campoPesquisa) ");
+        parametros.put(CAMPO_PESQUISA , "%"+filtro.getCampoPesquisa()+"%");
+        this.tratarDataInicioComFinalNull(parametros,queryStr,filtro);
+        this.tratarDataInicioComFinal(parametros,queryStr,filtro);
+
+    }
+
+    public void setPesquisarNormal(Map<String, Object> parametros ,  StringBuilder queryStr, FiltroInformacaoDTO filtro  ){
+        this.setSelect(queryStr);
+        this.setJoins(queryStr);
+        queryStr.append(" where cast(info.id_informacao as text) is not null and cast(info.id_informacao as text) like :campoPesquisa ");
+        parametros.put(CAMPO_PESQUISA, "%" + filtro.getCampoPesquisa() + "%");
+        this.tratarDataInicioComFinalNull(parametros, queryStr, filtro);
+        this.tratarDataInicioComFinal(parametros, queryStr, filtro);
+
+        queryStr.append(SQL_UNION);
+
+        this.setSelect(queryStr);
+        this.setJoins(queryStr);
+        queryStr.append(" where info.id_informacao is not null and lower(info.detalhe) like lower(:campoPesquisa) ");
+        parametros.put(CAMPO_PESQUISA, "%" + filtro.getCampoPesquisa() + "%");
+        this.tratarDataInicioComFinalNull(parametros, queryStr, filtro);
+        this.tratarDataInicioComFinal(parametros, queryStr, filtro);
+        // UNION N FUNCIONA COM LIMIT
+
+        queryStr.append(SQL_UNION);
+        this.setSelect(queryStr);
+        this.setJoins(queryStr);
+        queryStr.append(" WHERE info.id_informacao is not null and lower(info.titulo) like lower(:campoPesquisa) ");
+        parametros.put(CAMPO_PESQUISA, "%" + filtro.getCampoPesquisa() + "%");
+        this.tratarDataInicioComFinalNull(parametros, queryStr, filtro);
+        this.tratarDataInicioComFinal(parametros, queryStr, filtro);
+
+
+        queryStr.append(SQL_UNION);
+        this.setSelect(queryStr);
+        this.setJoins(queryStr);
+        queryStr.append(" WHERE info.id_informacao is not null and lower(te.descricao) like lower(:campoPesquisa) ");
+        parametros.put(CAMPO_PESQUISA, "%" + filtro.getCampoPesquisa() + "%");
+        this.tratarDataInicioComFinalNull(parametros, queryStr, filtro);
+        this.tratarDataInicioComFinal(parametros, queryStr, filtro);
+
+
+        queryStr.append(SQL_UNION);
+        this.setSelect(queryStr);
+        this.setJoins(queryStr);
+        queryStr.append("  WHERE info.id_informacao is not null and lower(tp.nome) like lower(:campoPesquisa) ");
+        parametros.put(CAMPO_PESQUISA, "%" + filtro.getCampoPesquisa() + "%");
+        this.tratarDataInicioComFinalNull(parametros, queryStr, filtro);
+        this.tratarDataInicioComFinal(parametros, queryStr, filtro);
+
+
+        queryStr.append(SQL_UNION);
+        this.setSelect(queryStr);
+        this.setJoins(queryStr);
+        queryStr.append("  WHERE info.id_informacao is not null and lower(tv.descricao) like lower(:campoPesquisa) ");
+        parametros.put(CAMPO_PESQUISA, "%" + filtro.getCampoPesquisa() + "%");
+        this.tratarDataInicioComFinalNull(parametros, queryStr, filtro);
+        this.tratarDataInicioComFinal(parametros, queryStr, filtro);
+
     }
 
 }

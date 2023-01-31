@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
-
+import java.time.LocalDateTime;
 
 
 @Builder
@@ -32,6 +32,25 @@ public class Veiculo extends EntityBase<Long>{
 
     @Column(name = "placa")
     private String placa;
+
+    @Column(name = "informacoes")
+    private String informacoes;
+    @Column(name = "proprietario")
+    private String proprietario;
+    @Column(name = "endereco")
+    private String endereco;
+
+    @Column(name = "carater_geral" , columnDefinition="VARCHAR DEFAULT N")
+    private String caraterGeral;
+
+    @Column(name = "dt_ultima_alteracao")
+    private LocalDateTime dataAlteracao;
+
+    @Column(name = "status_carater_geral")
+    private String statusCaraterGeral;
+
+    @Column(name = "desfecho_carater_geral")
+    private String desfechoCaraterGeral;
 
 
     @ManyToOne(fetch=FetchType.LAZY )

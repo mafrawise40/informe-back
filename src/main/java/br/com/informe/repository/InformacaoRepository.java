@@ -17,7 +17,7 @@ public interface InformacaoRepository extends JpaRepository<Informacao, Long> {
             + " LEFT JOIN info.marcadores m "
             + " LEFT JOIN m.endereco en  "
             + " ORDER BY info.dataAlteracao DESC ")*/
-   @Query("SELECT DISTINCT info FROM Informacao info "
+    @Query("SELECT DISTINCT info FROM Informacao info "
             + " LEFT JOIN info.informePessoas p "
             + " LEFT JOIN info.veiculos v "
             + " LEFT JOIN info.marcadores m "
@@ -25,6 +25,15 @@ public interface InformacaoRepository extends JpaRepository<Informacao, Long> {
             + " ORDER BY info.dataAlteracao DESC ")
 
     List<Informacao> retornarTodos();
+
+    /*@Query(value = "SELECT DISTINCT new br.com.informe.dto.InformacaoDTO( info.id, info.titulo , info.detalhe , info.dataAlteracao) " +
+            " FROM Informacao info " +
+            " WHERE (:id is null or info.id like %:id%) " +
+            " AND (:titulo is null or info.titulo like %:titulo%) " +
+            " AND (:detalhe is null or info.detalhe like %:detalhe%) " +
+            " ORDER BY info.dataAlteracao DESC " +
+            "   " )
+    List<InformacaoDTO> retornarInformacaoRelatorio();*/
 
 
 }

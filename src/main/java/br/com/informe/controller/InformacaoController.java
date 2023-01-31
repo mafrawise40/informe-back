@@ -68,4 +68,10 @@ public class InformacaoController {
         service.uploadFotos(allRequestParams, comprimido,tituloImagem ,idInformacao );
     }
 
+
+    @PostMapping("/get-informacao-relatorio")
+    public ResponseEntity<List<InformacaoDTO>> getInformacaoRelatorio(@RequestBody FiltroInformacaoDTO filtroInformacaoDTO){
+        return ResponseEntity.ok().body(service.getInformacaoRelatorio(filtroInformacaoDTO));
+    }
+
 }

@@ -68,7 +68,7 @@ public class Pessoa extends EntityBase<Long>{
 
     @JsonManagedReference
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    @OneToMany(mappedBy="pessoaArquivo", cascade = {PERSIST, MERGE, REFRESH, DETACH} , fetch=FetchType.LAZY )
+    @OneToMany(mappedBy="pessoaArquivo",  fetch=FetchType.LAZY )
     private List<ArquivoPessoa> arquivos;
 
     @Override

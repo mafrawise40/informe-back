@@ -18,5 +18,7 @@ public class FiltroInformacaoDTO extends BaseDTO {
     LocalDateTime dataInicial;
     LocalDateTime dataFinal;
 
+    Integer limit;
+
 
 }

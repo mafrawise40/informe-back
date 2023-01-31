@@ -43,4 +43,12 @@ public class InformacaoDTO extends BaseDTO {
     private List<Long> pessoasRemovidas;
     private List<Long> veiculosRemovido;
 
+
+    public InformacaoDTO(Long id , String titulo , String detalhe, LocalDateTime dataAlteracao){
+        this.id = id;
+        this.titulo = titulo;
+        this.detalhe = detalhe;
+        this.dataAlteracao = dataAlteracao;
+    }
+
 }

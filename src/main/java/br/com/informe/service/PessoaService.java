@@ -1,12 +1,12 @@
 package br.com.informe.service;
 
-import br.com.informe.dto.ArquivoPessoaDTO;
 import br.com.informe.dto.InformacaoPessoaDTO;
 import br.com.informe.dto.PessoaDTO;
-import br.com.informe.entity.*;
+import br.com.informe.entity.ArquivoPessoa;
+import br.com.informe.entity.InformacaoPessoa;
+import br.com.informe.entity.Pessoa;
 import br.com.informe.mapper.Mapper;
 import br.com.informe.repository.ArquivoPessoaRepository;
-import br.com.informe.repository.ArquivoRepository;
 import br.com.informe.repository.InformacaoPessoaRepository;
 import br.com.informe.repository.PessoaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,8 +49,13 @@ public class PessoaService {
         Optional<Pessoa> optional = repository.findById(id);
         if (optional.isPresent()) {
             Pessoa pessoaDeletada = optional.get();
-          //  pessoaDeletada.setInforme(null);
+
             if ( informacaoPessoaRepository.getByInformacaoAndPessoa(null,pessoaDeletada.getId()).isEmpty()) {
+
+                pessoaDeletada.getArquivos().forEach( arquivoPessoa -> {
+                    arquivoRepository.deleteById(arquivoPessoa.getId());
+                });
+
                 repository.deleteById(pessoaDeletada.getId());
             }else {
                 throw new RuntimeException("Pessoa possui vínculos no sistema");
@@ -112,7 +117,8 @@ public class PessoaService {
 
     @Transactional
     public List<InformacaoPessoaDTO> getVinculosPessoas(Long id) {
-        List<InformacaoPessoa> vinculos = informacaoPessoaRepository.getVinculosPessoas(id);
+        List<InformacaoPessoa> vinculos = new ArrayList<>();
+                informacaoPessoaRepository.getVinculosPessoas(id);
         if (!vinculos.isEmpty()) {
             return mapper.listEntityToListDTO(vinculos,InformacaoPessoaDTO.class);
         }else{
@@ -122,21 +128,24 @@ public class PessoaService {
 
 
     @Transactional
-    public List<ArquivoPessoaDTO> uploadFotos(Map<String, MultipartFile> allRequestParams ,
-                                              Map<String, String> allComprimidos,
-                                              Map<String,String> tituloImagem,
-                                              Long idPessoa) {
+    public void uploadFotos(Map<String, MultipartFile> allRequestParams ,
+                            Map<String, String> allComprimidos,
+                            Map<String,String> tituloImagem,
+                            Long idPessoa) {
 
-        Pessoa pessoa = Pessoa.builder().id(idPessoa).build();
-        List<ArquivoPessoaDTO> retorno = new ArrayList<>();
+        Pessoa pessoa = repository.getOne(idPessoa);
+
+        List<ArquivoPessoa> arquivoPessoaList = new ArrayList<>();
+
         allRequestParams.forEach((key, multipartFile) ->{
+
+            ArquivoPessoa arquivoPessoa = null;
             try {
-
-
-
-                ArquivoPessoa arquivoPessoa = ArquivoPessoa.builder().arquivo(multipartFile.getBytes())
+                arquivoPessoa = ArquivoPessoa.builder().arquivo(multipartFile.getBytes())
                         .descricao(multipartFile.getOriginalFilename())
-                        .pessoaArquivo(pessoa).build();
+                        .build();
+
+                arquivoPessoa.setPessoaArquivo(pessoa);
 
                 if( allComprimidos.containsKey(key) ) {
                     //arquivo.setArquivoComprimido(allComprimidos.get(key));
@@ -145,15 +154,17 @@ public class PessoaService {
                     arquivoPessoa.setTitulo(tituloImagem.get(key));
                 }
 
-                retorno.add(mapper.entityToDTO( repositoryArquivo.save(arquivoPessoa) , ArquivoPessoaDTO.class ));
-
-
+                arquivoPessoaList.add(arquivoPessoa);
+                repositoryArquivo.save(arquivoPessoa);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
 
+
+
         });
-        return retorno;
+        pessoa.setArquivos(arquivoPessoaList);
+
     }
 
 

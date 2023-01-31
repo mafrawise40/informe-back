@@ -4,7 +4,6 @@ package br.com.informe.service;
 import br.com.informe.dto.ArquivoDTO;
 import br.com.informe.dto.FiltroInformacaoDTO;
 import br.com.informe.dto.InformacaoDTO;
-import br.com.informe.dto.PessoaDTO;
 import br.com.informe.entity.*;
 import br.com.informe.mapper.Mapper;
 import br.com.informe.repository.*;
@@ -62,7 +61,7 @@ public class InformacaoService {
 
 
         List<Informacao> listEnty = informeRepository.retornarTodos();
-        List<Pessoa> pessoaList = new ArrayList<>();
+
         listEnty.forEach(informacao ->  {
             informacao.setArquivos(null);
             informacao.getInformePessoas().forEach(pessoaInforme-> {
@@ -86,11 +85,7 @@ public class InformacaoService {
                 );
             }
 
-            /*if ( ret.getPessoas() != null) {
-                ret.getPessoas().forEach(pessoaDTO ->
-                                pessoas.append(pessoaDTO.getNome() + " ; ")
-                );
-            }*/
+
             if ( ret.getInformePessoas() != null) {
                 ret.getInformePessoas().forEach(pessoaDTO ->
                         pessoas.append(pessoaDTO.getPessoa().getNome() + " ; ")
@@ -124,7 +119,6 @@ public class InformacaoService {
         entity.setSitucao("infomacao");
 
         //por enquanto
-       List<InformacaoPessoa> newInformePessoaList = new ArrayList<>();
        if ( entity.getInformePessoas() != null ) {
            entity.getInformePessoas().forEach(informacaoPessoa -> {
                if (informacaoPessoa.getPessoa().getId() == null || informacaoPessoa.getPessoa().getId() == 0) {
@@ -148,10 +142,7 @@ public class InformacaoService {
                 veiculo.setInformeVeiculo(null);
                 veiculoRepository.save(veiculo);
             });
-          /*  info.getPessoas().forEach(pessoa -> {
-                pessoa.setInforme(null);
-                pessoaRepository.save(pessoa);
-            });*/
+
             info.getArquivos().forEach(arquivo -> {
                 arquivo.setInformeArquivo(null);
                 arquivoRepository.save(arquivo);
@@ -264,5 +255,13 @@ public class InformacaoService {
         return retorno;
     }
 
+
+    @Transactional
+    public List<InformacaoDTO> getInformacaoRelatorio(FiltroInformacaoDTO filtroInformacaoDTO){
+
+        filtroInformacaoDTO.setLimit(6);
+        return  mapper.listEntityToListDTO(infoRepImp.buscarPorParamentros(filtroInformacaoDTO), InformacaoDTO.class);
+
+    }
 
 }

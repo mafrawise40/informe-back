@@ -31,6 +31,9 @@ public class PessoaDTO  extends BaseDTO  {
     private PessoaDTO pessoaDTO;
     private String nascimento;
 
+    private String mandado;
+    private String foragido;
+
     @JsonBackReference(value = "pessoaMang")
     private InformacaoDTO informeArquivo;
 
@@ -39,5 +42,8 @@ public class PessoaDTO  extends BaseDTO  {
 
 
 
+    //TODO Lista de mandados para cada pessoa.
+    //TODO melhor o robô para extrair foto das pessoas no genesis
+    //TODO CORRIGIR A FORMA QUE A TABELA DE RELATORIO GERA..
 
 }

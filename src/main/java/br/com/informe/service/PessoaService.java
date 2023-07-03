@@ -118,7 +118,7 @@ public class PessoaService {
     @Transactional
     public List<InformacaoPessoaDTO> getVinculosPessoas(Long id) {
         List<InformacaoPessoa> vinculos = new ArrayList<>();
-                informacaoPessoaRepository.getVinculosPessoas(id);
+        vinculos =  informacaoPessoaRepository.getVinculosPessoas(id);
         if (!vinculos.isEmpty()) {
             return mapper.listEntityToListDTO(vinculos,InformacaoPessoaDTO.class);
         }else{

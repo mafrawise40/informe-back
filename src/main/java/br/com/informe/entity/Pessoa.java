@@ -37,7 +37,7 @@ public class Pessoa extends EntityBase<Long>{
     @Column(name = "situacao")
     private String situacao;
 
-    @Column(name = "observacao")
+    @Column(name = "observacao",  columnDefinition = "TEXT")
     private String  observacao;
 
     @Column(name = "cpf")
@@ -60,6 +60,11 @@ public class Pessoa extends EntityBase<Long>{
     @Column(name = "nascimento")
     private String nascimento;
 
+    @Column(name = "mandado")
+    private String mandado;
+
+    @Column(name = "foragido" , columnDefinition = "VARCHAR(1)")
+    private String foragido;
 
     @JsonIgnore
     @OneToMany(mappedBy = "pessoa", fetch = FetchType.LAZY, cascade = {PERSIST, MERGE, REFRESH, DETACH})

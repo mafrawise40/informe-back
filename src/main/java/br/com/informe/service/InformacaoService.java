@@ -50,7 +50,6 @@ public class InformacaoService {
         List<Informacao> listEnty = infoRepImp.buscarPorParamentros(filtroInformacaoDTO);
         listEnty.forEach(informacao -> {
             informacao.setArquivos(null);
-           // informacao.setPessoas(null);
             informacao.setVeiculos(null);
         });
         return  mapper.listEntityToListDTO(listEnty, InformacaoDTO.class);
@@ -121,10 +120,18 @@ public class InformacaoService {
         //por enquanto
        if ( entity.getInformePessoas() != null ) {
            entity.getInformePessoas().forEach(informacaoPessoa -> {
+
+
+               if ( informacaoPessoa.getEnvolvimento().toLowerCase().equals("foragido")) {
+                    informacaoPessoa.getPessoa().setForagido("S");
+               }
+
                if (informacaoPessoa.getPessoa().getId() == null || informacaoPessoa.getPessoa().getId() == 0) {
                    Pessoa pessoa = pessoaRepository.save(informacaoPessoa.getPessoa());
                    informacaoPessoa.setPessoa(pessoa);
                }
+
+
                informacaoPessoa.setInformacao(entity);
 
            });
@@ -187,7 +194,13 @@ public class InformacaoService {
 
         if ( informacao.getInformePessoas() != null ) {
             informacao.getInformePessoas().forEach(
+
                     informacaoPessoa -> {
+
+                        if (informacaoPessoa.getEnvolvimento()!=null && informacaoPessoa.getEnvolvimento().toLowerCase().contains("foragido")) {
+                            informacaoPessoa.getPessoa().setForagido("S");
+                        }
+
                         if (informacaoPessoa.getPessoa().getId() == null || informacaoPessoa.getPessoa().getId() == 0) {
                             Pessoa pessoa = pessoaRepository.save(informacaoPessoa.getPessoa());
                             informacaoPessoa.setPessoa(pessoa);

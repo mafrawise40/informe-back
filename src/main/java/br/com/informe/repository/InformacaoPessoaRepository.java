@@ -27,7 +27,7 @@ public interface InformacaoPessoaRepository extends JpaRepository<InformacaoPess
 
     @Query(
             "SELECT informePessoa FROM InformacaoPessoa informePessoa " +
-                    " WHERE informePessoa.informacao.id = (SELECT informePessoaInt.informacao.id FROM InformacaoPessoa informePessoaInt " +
+                    " WHERE informePessoa.informacao.id IN (SELECT informePessoaInt.informacao.id FROM InformacaoPessoa informePessoaInt " +
                     "                                        WHERE informePessoaInt.pessoa.id = :pessoaId " +
                     "                                       ) "
     )

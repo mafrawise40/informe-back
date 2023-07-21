@@ -29,7 +29,7 @@ public class Endereco   extends EntityBase<Long>{
     @Column(name = "regiao")
     private String regiao;
 
-    @Column(name = "uf")
+    @Column(name = "uf" , length = 2)
     private String uf;
 
     @Column(name = "observacao")
